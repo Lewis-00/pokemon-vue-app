@@ -7,7 +7,8 @@ const LIMIT = 150;
 const router = useRouter();
 
 const pokemonList = ref<IPokemon[]>([]);
-const isLoading = ref<boolean>(false);
+const isLoadingFirstFetch = ref<boolean>(false);
+const isLoadingList = ref<boolean>(false);
 
 const search = ref<string>("");
 
@@ -22,7 +23,8 @@ const redirectToPokemonInfo = (pokemon: IPokemon) => {
 };
 
 onMounted(async () => {
-  isLoading.value = true;
+  isLoadingFirstFetch.value = true;
+  isLoadingList.value = true;
   for (let i = 1; i <= LIMIT; i++) {
     const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
     const pokemon = await response.json();
@@ -36,13 +38,14 @@ onMounted(async () => {
       ),
     };
     pokemonList.value.push(pokemonObject);
+    isLoadingFirstFetch.value = false;
   }
-  isLoading.value = false;
+  isLoadingList.value = false;
 });
 </script>
 <template>
   <div
-    v-if="isLoading"
+    v-if="isLoadingFirstFetch"
     class="d-flex justify-content-center align-items-center gap-3 mt-3"
   >
     <h1>Loading...</h1>
@@ -50,6 +53,14 @@ onMounted(async () => {
   </div>
 
   <div v-else class="container text-center">
+    <h1>Pokemon List</h1>
+    <div
+      v-if="isLoadingList"
+      class="d-flex align-items-baseline justify-content-center gap-3"
+    >
+      <p>Loading others pokemon</p>
+      <span class="spinner-border spinner-border-sm" role="status"></span>
+    </div>
     <div class="input-group mb-3">
       <input
         type="text"
