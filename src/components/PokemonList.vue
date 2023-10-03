@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from "vue";
 import type { IPokemon } from "src/utils/types.ts";
+import { useRouter } from "vue-router";
 
 const LIMIT = 150;
+const router = useRouter();
 
 const pokemonList = ref<IPokemon[]>([]);
 const isLoading = ref<boolean>(false);
@@ -14,6 +16,10 @@ const filteredPokemonList = computed(() => {
     pokemon.name.toLowerCase().includes(search.value.toLowerCase())
   );
 });
+
+const redirectToPokemonInfo = (pokemon: IPokemon) => {
+  router.push({ name: "Pokemon-Info", params: { id: pokemon.id } });
+};
 
 onMounted(async () => {
   isLoading.value = true;
@@ -65,8 +71,13 @@ onMounted(async () => {
           <img :src="pokemon.image" class="card-img-top" :alt="pokemon.name" />
           <div class="card-body">
             <h5 class="card-title">{{ pokemon.name }}</h5>
-            <p class="card-text">Types: {{ pokemon.types.join(", ") }}</p>
-            <button type="button" class="btn btn-info">Info</button>
+            <button
+              type="button"
+              @click="redirectToPokemonInfo(pokemon)"
+              class="btn btn-info"
+            >
+              Info
+            </button>
           </div>
         </div>
       </div>

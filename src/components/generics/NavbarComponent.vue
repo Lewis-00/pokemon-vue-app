@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="/">Pokemon Vue</a>
+      <RouterLink class="navbar-brand" to="/">Pokemon Vue</RouterLink>
       <button
         class="navbar-toggler"
         type="button"
@@ -16,10 +16,12 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/">Home</a>
+            <RouterLink class="nav-link active" aria-current="page" to="/"
+              >Home</RouterLink
+            >
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/list">List</a>
+            <RouterLink to="/list" class="nav-link">List</RouterLink>
           </li>
         </ul>
       </div>
