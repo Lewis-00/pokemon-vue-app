@@ -1,6 +1,8 @@
 # pokemon-vue-app
 
 Simple project in vue done to learn the basics of the framework
+
+
 This template should help get you started developing with Vue 3 in Vite.
 
 ## Recommended IDE Setup
