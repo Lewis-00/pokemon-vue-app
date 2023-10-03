@@ -56,6 +56,14 @@ onMounted(async () => {
   </div>
 
   <div v-else class="container text-center">
+    <h1>Pokemon List</h1>
+    <div
+      v-if="isLoadingList"
+      class="d-flex align-items-baseline justify-content-center gap-3"
+    >
+      <p>Loading others pokemon</p>
+      <span class="spinner-border spinner-border-sm" role="status"></span>
+    </div>
     <PokemonListSearchForm
       @search-pokemon="(pokemon: string) => searchPokemon = pokemon"
     />
