@@ -9,7 +9,7 @@ const routes = [
   {
     path: "/list",
     name: "Pokemon-List",
-    component: () => import("../components/PokemonList.vue"),
+    component: () => import("../components/pokemon-list/PokemonList.vue"),
   },
   {
     path: "/pokemon/info/:id",

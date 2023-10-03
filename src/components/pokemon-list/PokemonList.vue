@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PokemonListSearchForm from "./components/PokemonListSearchForm.vue";
 import { onMounted, ref, computed } from "vue";
 import type { IPokemon } from "src/utils/types.ts";
 import { useRouter } from "vue-router";
@@ -7,6 +8,8 @@ const LIMIT = 150;
 const router = useRouter();
 
 const pokemonList = ref<IPokemon[]>([]);
+
+const searchPokemon = ref<string>("");
 const isLoadingFirstFetch = ref<boolean>(false);
 const isLoadingList = ref<boolean>(false);
 
@@ -14,7 +17,7 @@ const search = ref<string>("");
 
 const filteredPokemonList = computed(() => {
   return pokemonList.value.filter((pokemon) =>
-    pokemon.name.toLowerCase().includes(search.value.toLowerCase())
+    pokemon.name.toLowerCase().includes(searchPokemon.value.toLowerCase())
   );
 });
 
@@ -61,16 +64,9 @@ onMounted(async () => {
       <p>Loading others pokemon</p>
       <span class="spinner-border spinner-border-sm" role="status"></span>
     </div>
-    <div class="input-group mb-3">
-      <input
-        type="text"
-        v-model="search"
-        class="form-control"
-        placeholder="Search Pokemon"
-        aria-label="search-pokemon"
-        aria-describedby="basic-addon1"
-      />
-    </div>
+    <PokemonListSearchForm
+      @search-pokemon="(pokemon: string) => searchPokemon = pokemon"
+    />
 
     <div class="row">
       <div
