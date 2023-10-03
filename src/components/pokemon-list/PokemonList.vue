@@ -8,8 +8,12 @@ const LIMIT = 150;
 const router = useRouter();
 
 const pokemonList = ref<IPokemon[]>([]);
-const isLoading = ref<boolean>(false);
+
 const searchPokemon = ref<string>("");
+const isLoadingFirstFetch = ref<boolean>(false);
+const isLoadingList = ref<boolean>(false);
+
+const search = ref<string>("");
 
 const filteredPokemonList = computed(() => {
   return pokemonList.value.filter((pokemon) =>
@@ -22,7 +26,8 @@ const redirectToPokemonInfo = (pokemon: IPokemon) => {
 };
 
 onMounted(async () => {
-  isLoading.value = true;
+  isLoadingFirstFetch.value = true;
+  isLoadingList.value = true;
   for (let i = 1; i <= LIMIT; i++) {
     const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
     const pokemon = await response.json();
@@ -36,13 +41,14 @@ onMounted(async () => {
       ),
     };
     pokemonList.value.push(pokemonObject);
+    isLoadingFirstFetch.value = false;
   }
-  isLoading.value = false;
+  isLoadingList.value = false;
 });
 </script>
 <template>
   <div
-    v-if="isLoading"
+    v-if="isLoadingFirstFetch"
     class="d-flex justify-content-center align-items-center gap-3 mt-3"
   >
     <h1>Loading...</h1>
