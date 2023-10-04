@@ -5,3 +5,8 @@ export interface IPokemon {
   abilities: string[];
   id: number;
 }
+
+export interface IGenericTypes {
+  name: string;
+  url: string;
+}

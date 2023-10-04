@@ -2,46 +2,69 @@
 import PokemonListSearchForm from "./components/PokemonListSearchForm.vue";
 import { onMounted, ref, computed } from "vue";
 import type { IPokemon } from "src/utils/types.ts";
+import { capitalizeFirstLetter } from "../../utils/methods";
 import { useRouter } from "vue-router";
 
-const LIMIT = 150;
+// constantes
+const POKEMON_LIMIT_RESULTS = 150;
 const router = useRouter();
 
+// REF variables
 const pokemonList = ref<IPokemon[]>([]);
-
 const searchPokemon = ref<string>("");
 const isLoadingFirstFetch = ref<boolean>(false);
 const isLoadingList = ref<boolean>(false);
+const abilityFilter = ref<string>("");
 
-const search = ref<string>("");
-
+// Methods
 const filteredPokemonList = computed(() => {
-  return pokemonList.value.filter((pokemon) =>
-    pokemon.name.toLowerCase().includes(searchPokemon.value.toLowerCase())
-  );
+  const searchNormalized = searchPokemon.value.toLowerCase();
+  const abilityFilterNormalized = abilityFilter.value.toLowerCase();
+
+  return pokemonList.value.filter((pokemon) => {
+    const nameMatches = pokemon.name.toLowerCase().includes(searchNormalized);
+    if (abilityFilterNormalized === "") {
+      return nameMatches;
+    } else {
+      return (
+        pokemon.name.toLowerCase().startsWith(searchNormalized) &&
+        pokemon.abilities.includes(abilityFilterNormalized)
+      );
+    }
+  });
 });
 
 const redirectToPokemonInfo = (pokemon: IPokemon) => {
   router.push({ name: "Pokemon-Info", params: { id: pokemon.id } });
 };
 
+const fetchPokemon = async (id: number) => {
+  const response = await fetch(`https://pokeapi.co/api/v2/pokemdwon/${id}`);
+  const pokemon = await response.json();
+  const pokemonObject: IPokemon = {
+    id: pokemon.id,
+    name: pokemon.name,
+    image: pokemon.sprites.front_default,
+    types: pokemon.types.map((typeInfo: any) => typeInfo.type.name),
+    abilities: pokemon.abilities.map(
+      (abilityInfo: any) => abilityInfo.ability.name
+    ),
+  };
+  pokemonList.value.push(pokemonObject);
+  isLoadingFirstFetch.value = false;
+  return pokemonObject;
+};
+
 onMounted(async () => {
   isLoadingFirstFetch.value = true;
   isLoadingList.value = true;
-  for (let i = 1; i <= LIMIT; i++) {
-    const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
-    const pokemon = await response.json();
-    const pokemonObject: IPokemon = {
-      id: pokemon.id,
-      name: pokemon.name,
-      image: pokemon.sprites.front_default,
-      types: pokemon.types.map((typeInfo: any) => typeInfo.type.name),
-      abilities: pokemon.abilities.map(
-        (abilityInfo: any) => abilityInfo.ability.name
-      ),
-    };
-    pokemonList.value.push(pokemonObject);
-    isLoadingFirstFetch.value = false;
+  for (let i = 1; i <= POKEMON_LIMIT_RESULTS; i++) {
+    try {
+      await fetchPokemon(i);
+    } catch (error) {
+      console.log("OPS! Si è verificato un errore: ", error);
+      break;
+    }
   }
   isLoadingList.value = false;
 });
@@ -66,6 +89,7 @@ onMounted(async () => {
     </div>
     <PokemonListSearchForm
       @search-pokemon="(pokemon: string) => searchPokemon = pokemon"
+      @ability-filter="(ability: string) => abilityFilter = ability"
     />
 
     <div class="row">
@@ -77,7 +101,9 @@ onMounted(async () => {
         <div class="card mt-3">
           <img :src="pokemon.image" class="card-img-top" :alt="pokemon.name" />
           <div class="card-body">
-            <h5 class="card-title">{{ pokemon.name }}</h5>
+            <h5 class="card-title">
+              {{ capitalizeFirstLetter(pokemon.name) }}
+            </h5>
             <button
               type="button"
               @click="redirectToPokemonInfo(pokemon)"
